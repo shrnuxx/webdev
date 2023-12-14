@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Number Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-weight: Arial;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            background-color:#4CAF50;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #e0e0e0;
+        }
+
+        button.edit {
+            background-color: #2196F3;
+            color: white;
+            margin-right: 5px;
+        }
+
+        button.edit:hover {
+            background-color: #0b7dda;
+        }
+
+        button.delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        button.delete:hover {
+            background-color: #d32f2f;
+        }
+
+        #result {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h2>Student Data Entry</h2>
+        
+        <label for="firstName">First Name:</label>
+        <input type="text" v-model="firstName" placeholder="Enter first name">
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" v-model="lastName" placeholder="Enter last name">
+
+        <button @click="generateStudentNumber">Generate Student Number</button>
+
+        <!-- Display table for student data -->
+        <table v-if="students.length > 0">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(student, index) in students" :key="index">
+                    <td>{{ student.studentID }}</td>
+                    <td>{{ student.firstName }}</td>
+                    <td>{{ student.lastName }}</td>
+                    <td>
+                        <button class="edit" @click="editStudent(index)">Edit</button>
+                        <button class="delete" @click="deleteStudent(index)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                firstName: "",
+                lastName: "",
+                generatedStudentNumber: "",
+                students: [], 
+                editingIndex: -1,
+            },
+            methods: {
+                generateStudentNumber: function () {
+                    const studentNumber =
+                        this.lastName.substring(0, 3).toUpperCase() +
+                        this.firstName.substring(0, 2).toUpperCase() +
+                        Math.floor(Math.random() * 1000);
+
+                    this.generatedStudentNumber = `Generated Student Number: ${studentNumber}`;
+
+                    if (this.editingIndex === -1) {
+                        // Add the generated student data to the array
+                        this.students.push({
+                            studentID: studentNumber,
+                            firstName: this.firstName,
+                            lastName: this.lastName,
+                        });
+                    } else {
+                       
+                        this.students[this.editingIndex].firstName = this.firstName;
+                        this.students[this.editingIndex].lastName = this.lastName;
+                        this.editingIndex = -1; 
+                    }
+
+                 
+                    this.firstName = "";
+                    this.lastName = "";
+                },
+
+                editStudent: function (index) {
+                
+                    this.editingIndex = index;
+
+                    this.generatedStudentNumber = '';
+
+                    this.firstName = this.students[index].firstName;
+                    this.lastName = this.students[index].lastName;
+                },
+
+                deleteStudent: function (index) {
+                    this.students.splice(index, 1);
+
+                    if (index === this.editingIndex) {
+                        this.editingIndex = -1;
+                    }
+
+                    this.firstName = "";
+                    this.lastName = "";
+                    this.generatedStudentNumber = '';
+                },
+            },
+        });
+    </script>
+</body>
+</html>
